@@ -20,22 +20,39 @@ import { TaskService } from '../services/task.service';
     IonItemSliding, IonItemOptions, IonItemOption,
   ],
 })
+/**
+ * Página de gestión de categorías.
+ *
+ * Permite crear, editar y eliminar categorías.
+ * Al eliminar una categoría, las tareas asociadas quedan sin categoría.
+ */
 export class CategoriesPage {
+  /** Servicio de categorías inyectado. */
   categoryService = inject(CategoryService);
+  /** Servicio de tareas (usado para desvincular tareas al eliminar una categoría). */
   private taskService = inject(TaskService);
+  /** Controlador de alertas de Ionic. */
   private alertCtrl = inject(AlertController);
 
+  /** Modelo bidireccional ligado al campo de nombre de nueva categoría. */
   newCategoryName = '';
+  /** Modelo bidireccional ligado al campo de color de nueva categoría. */
   newCategoryColor = '';
 
   constructor() {
     addIcons({ addOutline, createOutline, trashOutline, colorPaletteOutline });
   }
 
+  /** Devuelve el color sugerido del servicio para la próxima categoría. */
   get suggestedColor(): string {
     return this.categoryService.suggestedColor;
   }
 
+  /**
+   * Crea una nueva categoría a partir del nombre y color ingresados.
+   * Usa el color sugerido si el usuario no especificó uno.
+   * Limpia los campos tras la creación.
+   */
   addCategory(): void {
     const name = this.newCategoryName.trim();
     if (!name) return;
@@ -45,6 +62,12 @@ export class CategoriesPage {
     this.newCategoryColor = '';
   }
 
+  /**
+   * Muestra un diálogo para editar el nombre y color de una categoría.
+   * @param id - Identificador único de la categoría.
+   * @param currentName - Nombre actual (prellenado en el diálogo).
+   * @param currentColor - Color actual (prellenado en el diálogo).
+   */
   async editCategory(id: string, currentName: string, currentColor: string): Promise<void> {
     const alert = await this.alertCtrl.create({
       header: 'Editar categoría',
@@ -67,6 +90,12 @@ export class CategoriesPage {
     await alert.present();
   }
 
+  /**
+   * Muestra un diálogo de confirmación antes de eliminar una categoría.
+   * Al confirmar, desvincula la categoría de las tareas y luego la elimina.
+   * @param id - Identificador único de la categoría.
+   * @param name - Nombre de la categoría (mostrado en el mensaje de confirmación).
+   */
   async confirmDelete(id: string, name: string): Promise<void> {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar categoría',

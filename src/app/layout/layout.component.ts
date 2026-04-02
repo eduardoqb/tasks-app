@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonIcon,
   IonSegment, IonSegmentButton, IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { listOutline, pricetagsOutline } from 'ionicons/icons';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
@@ -18,24 +18,36 @@ import { Router } from '@angular/router';
     IonSegment, IonSegmentButton, IonLabel,
   ],
 })
+/**
+ * Componente de layout principal.
+ *
+ * Define la estructura visual global (header, toolbar con segmento de navegación
+ * y área de contenido) y aloja las vistas hijas mediante `<router-outlet>`.
+ * Sincroniza el segmento activo con la URL actual.
+ */
 export class LayoutComponent {
-  currentSegment = 'home';
+  /** Router de Angular para la navegación programática. */
+  private router = inject(Router);
+  /** Segmento de navegación activo (`'home'` | `'categories'`). */
+  currentSegment = signal('home');
 
-  constructor(private router: Router) {
+  constructor() {
     addIcons({ listOutline, pricetagsOutline });
 
-    this.router.events.subscribe(() => {
-      if (this.router.url.includes('categories')) {
-        this.currentSegment = 'categories';
-      } else {
-        this.currentSegment = 'home';
-      }
+    this.router.events.pipe(takeUntilDestroyed()).subscribe(() => {
+      const segment = this.router.url.includes('categories') ? 'categories' : 'home';
+      this.currentSegment.set(segment);
     });
   }
 
+  /**
+   * Maneja el cambio de segmento en la barra de navegación.
+   * Actualiza el signal y navega a la ruta correspondiente.
+   * @param event - Evento emitido por `IonSegment`.
+   */
   onSegmentChange(event: any): void {
     const value = event.detail.value;
-    this.currentSegment = value;
+    this.currentSegment.set(value);
     this.router.navigate([value]);
   }
 }

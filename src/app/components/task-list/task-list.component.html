@@ -3,7 +3,7 @@
   <ion-note>{{ tasks().length }}</ion-note>
 </div>
 <ion-list class="task-list" [class.completed-list]="isCompleted()" lines="none">
-  @for (task of tasks(); track task.id) {
+  @for (task of visibleTasks(); track task.id) {
     <ion-item-sliding #sliding>
       <ion-item
         class="task-item"
@@ -32,3 +32,10 @@
     </ion-item-sliding>
   }
 </ion-list>
+
+@if (hasMore()) {
+  <ion-button expand="block" fill="clear" size="small" (click)="loadMore()">
+    <ion-icon slot="start" name="chevron-down-outline"></ion-icon>
+    Mostrar más ({{ remainingCount() }} restantes)
+  </ion-button>
+}

@@ -1,19 +1,24 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Task } from '../models/task.model';
+import { uniqueId } from '../utils/id';
+import { StorageService } from './storage.service';
 
-/** Clave utilizada en `localStorage` para persistir las tareas. */
-const STORAGE_KEY = 'todo_tasks';
+const STORAGE_KEY = 'tasks';
 
 /**
  * Servicio central de gestión de tareas.
  *
  * Utiliza Angular Signals para exponer el estado reactivo
- * y persiste los datos en `localStorage`.
+ * y persiste los datos mediante `StorageService`.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class TaskService {
+  private storageService = inject(StorageService);
+
   /** Signal interna que almacena la lista completa de tareas. */
-  private tasksSignal = signal<Task[]>(this.loadFromStorage());
+  private tasksSignal = signal<Task[]>([]);
 
   /** Filtro activo de categoría (`null` = todas). */
   readonly categoryFilter = signal<string | null>(null);
@@ -41,6 +46,13 @@ export class TaskService {
   /** Signal computada con la cantidad de tareas pendientes. */
   readonly pendingCount = computed(() => this.pendingTasks().length);
 
+  /** Indica si la carga inicial desde storage ya finalizó. */
+  readonly ready = signal(false);
+
+  constructor() {
+    this.loadFromStorage();
+  }
+
   /**
    * Crea una nueva tarea y la inserta al inicio de la lista.
    * @param title - Título de la tarea a crear.
@@ -50,8 +62,10 @@ export class TaskService {
     const trimmed = title.trim();
     if (!trimmed) return;
 
+    const id = uniqueId(this.tasksSignal().map((t) => t.id));
+
     const task: Task = {
-      id: crypto.randomUUID(),
+      id,
       title: trimmed,
       completed: false,
       createdAt: Date.now(),
@@ -100,25 +114,36 @@ export class TaskService {
     this.categoryFilter.set(categoryId);
   }
 
-  /** Guarda el estado actual de las tareas en `localStorage`. */
+  private persistTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Guarda el estado actual de las tareas en el almacenamiento.
+   * Utiliza debounce para evitar escrituras excesivas durante
+   * operaciones rápidas consecutivas (ej. marcar varias tareas).
+   */
   private persist(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.tasksSignal()));
+    if (this.persistTimer) clearTimeout(this.persistTimer);
+    this.persistTimer = setTimeout(() => {
+      this.storageService.set(STORAGE_KEY, this.tasksSignal());
+    }, 300);
   }
 
   /**
-   * Carga las tareas almacenadas en `localStorage`.
+   * Carga las tareas almacenadas de forma asíncrona.
    * Normaliza tareas antiguas que no tengan `categoryId`.
    */
-  private loadFromStorage(): Task[] {
+  private async loadFromStorage(): Promise<void> {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const tasks: Task[] = raw ? JSON.parse(raw) : [];
-      return tasks.map((t) => ({
-        ...t,
-        categoryId: t.categoryId ?? null,
-      }));
+      const tasks = await this.storageService.get<Task[]>(STORAGE_KEY);
+      if (tasks) {
+        this.tasksSignal.set(
+          tasks.map((t) => ({ ...t, categoryId: t.categoryId ?? null }))
+        );
+      }
     } catch {
-      return [];
+      /* storage vacío o corrupto – se mantiene el array vacío */
+    } finally {
+      this.ready.set(true);
     }
   }
 }
