@@ -1,0 +1,45 @@
+<!-- Input para agregar tareas -->
+<div class="add-task-container">
+  <ion-item lines="none" class="task-input-item">
+    <ion-input
+      #taskInput
+      [(ngModel)]="newTaskTitle"
+      placeholder="¿Qué necesitas hacer?"
+      (keyup.enter)="addTask()"
+      [clearInput]="true"
+    ></ion-input>
+    <ion-button slot="end" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
+      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+</div>
+
+<!-- Tareas pendientes -->
+@if (taskService.pendingTasks().length > 0) {
+  <app-task-list
+    [tasks]="taskService.pendingTasks()"
+    title="Pendientes"
+    (toggle)="onToggle($event)"
+    (delete)="onDelete($event)"
+  />
+}
+
+<!-- Tareas completadas -->
+@if (taskService.completedTasks().length > 0) {
+  <app-task-list
+    [tasks]="taskService.completedTasks()"
+    title="Completadas"
+    [isCompleted]="true"
+    (toggle)="onToggle($event)"
+    (delete)="onDelete($event)"
+  />
+}
+
+<!-- Estado vacío -->
+@if (taskService.tasks().length === 0) {
+  <div class="empty-state">
+    <ion-icon name="checkmark-done-outline"></ion-icon>
+    <h2>¡Sin tareas!</h2>
+    <p>Agrega una nueva tarea usando el campo de arriba</p>
+  </div>
+}

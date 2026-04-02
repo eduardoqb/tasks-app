@@ -1,0 +1,27 @@
+<div class="section-header">
+  <h2>{{ title() }}</h2>
+  <ion-note>{{ tasks().length }}</ion-note>
+</div>
+<ion-list class="task-list" [class.completed-list]="isCompleted()" lines="none">
+  @for (task of tasks(); track task.id) {
+    <ion-item-sliding #sliding>
+      <ion-item
+        class="task-item"
+        [class.completed]="isCompleted()"
+        (click)="toggleSliding(sliding)"
+      >
+        <ion-checkbox
+          slot="start"
+          [checked]="task.completed"
+          (ionChange)="toggle.emit(task.id)"
+        ></ion-checkbox>
+        <ion-label [class.completed-label]="isCompleted()">{{ task.title }}</ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="delete.emit(task.id)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  }
+</ion-list>

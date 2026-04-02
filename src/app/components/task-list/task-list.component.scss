@@ -1,0 +1,52 @@
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 4px;
+  margin-top: 12px;
+
+  h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+
+  ion-note {
+    font-size: 0.8rem;
+    background: var(--ion-color-light);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+}
+
+.task-list {
+  background: transparent;
+  padding: 0;
+
+  ion-item-sliding {
+    margin-bottom: 8px;
+  }
+
+  .task-item {
+    --background: var(--ion-color-light);
+
+    ion-checkbox {
+      --size: 22px;
+      margin-right: 12px;
+    }
+
+    ion-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    &.completed .completed-label {
+      text-decoration: line-through;
+      color: var(--ion-color-medium);
+    }
+  }
+}
