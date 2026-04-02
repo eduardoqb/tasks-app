@@ -3,3 +3,40 @@
   margin-right: 6px;
   font-size: 1.2em;
 }
+
+ion-segment-button {
+  ion-icon {
+    font-size: 1.1rem;
+    margin-top: 6px;
+  }
+
+  ion-label {
+    font-size: 0.75rem;
+  }
+}
+
+.md {
+  ion-segment {
+    --background: transparent;
+  }
+
+  ion-segment-button {
+    --color: rgba(var(--ion-color-primary-contrast-rgb), 0.6);
+    --color-checked: var(--ion-color-primary-contrast);
+    --indicator-color: rgba(var(--ion-color-primary-contrast-rgb), 0.2);
+    font-size: 0.82rem;
+    //min-height: 44px;
+
+    ion-icon {
+      font-size: 1.1rem;
+      margin-bottom: 2px;
+      margin-top: 12px;
+    }
+
+    ion-label {
+      font-size: 0.75rem;
+      //text-transform: none;
+    }
+  }
+
+}

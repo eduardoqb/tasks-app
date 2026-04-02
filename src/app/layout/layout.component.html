@@ -5,12 +5,30 @@
       Mis Tareas
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment color="primary" [value]="currentSegment" (ionChange)="onSegmentChange($event)">
+      <ion-segment-button value="home">
+        <ion-icon name="list-outline"></ion-icon>
+        <ion-label>Tareas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="categories">
+        <ion-icon name="pricetags-outline"></ion-icon>
+        <ion-label>Categorías</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Mis Tareas</ion-title>
+      <ion-title size="large">
+        @if (currentSegment === 'home') {
+          Mis Tareas
+        } @else {
+          Categorías
+        }
+      </ion-title>
     </ion-toolbar>
   </ion-header>
 

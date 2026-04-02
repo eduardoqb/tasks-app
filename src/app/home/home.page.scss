@@ -13,6 +13,44 @@
       font-size: 1.4rem;
     }
   }
+
+  .category-select-item {
+    --background: var(--ion-color-light);
+    --border-radius: 12px;
+    --padding-start: 16px;
+    border-radius: 12px;
+    margin-top: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0 8px;
+
+  ion-chip {
+    --background: var(--ion-color-light);
+    font-size: 0.82rem;
+    height: 32px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .chip-active {
+    --background: var(--ion-color-primary);
+    --color: #fff;
+  }
+
+  .chip-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
 }
 
 .empty-state {

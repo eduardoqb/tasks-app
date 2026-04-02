@@ -2,24 +2,40 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonIcon,
+  IonSegment, IonSegmentButton, IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { listOutline } from 'ionicons/icons';
+import { listOutline, pricetagsOutline } from 'ionicons/icons';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
-  imports: [RouterOutlet, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon],
+  imports: [
+    RouterOutlet,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon,
+    IonSegment, IonSegmentButton, IonLabel,
+  ],
 })
-/**
- * Componente de layout principal.
- *
- * Define la estructura visual global (header, toolbar y área de contenido)
- * y aloja las vistas hijas mediante `<router-outlet>`.
- */
 export class LayoutComponent {
-  constructor() {
-    addIcons({ listOutline });
+  currentSegment = 'home';
+
+  constructor(private router: Router) {
+    addIcons({ listOutline, pricetagsOutline });
+
+    this.router.events.subscribe(() => {
+      if (this.router.url.includes('categories')) {
+        this.currentSegment = 'categories';
+      } else {
+        this.currentSegment = 'home';
+      }
+    });
+  }
+
+  onSegmentChange(event: any): void {
+    const value = event.detail.value;
+    this.currentSegment = value;
+    this.router.navigate([value]);
   }
 }

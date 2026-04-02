@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import {
   IonList, IonItem, IonLabel, IonIcon, IonCheckbox,
-  IonItemSliding, IonItemOptions, IonItemOption, IonNote,
+  IonItemSliding, IonItemOptions, IonItemOption, IonNote, IonBadge,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { trashOutline } from 'ionicons/icons';
 import { Task } from '../../models/task.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-task-list',
@@ -13,36 +14,28 @@ import { Task } from '../../models/task.model';
   styleUrls: ['./task-list.component.scss'],
   imports: [
     IonList, IonItem, IonLabel, IonIcon, IonCheckbox,
-    IonItemSliding, IonItemOptions, IonItemOption, IonNote,
+    IonItemSliding, IonItemOptions, IonItemOption, IonNote, IonBadge,
   ],
 })
-/**
- * Componente reutilizable que muestra una lista de tareas.
- *
- * Recibe las tareas y emite eventos cuando el usuario
- * marca/desmarca o elimina una tarea.
- */
 export class TaskListComponent {
-  /** Lista de tareas a renderizar. */
   tasks = input.required<Task[]>();
-  /** Título visible de la sección (ej. "Pendientes", "Completadas"). */
   title = input.required<string>();
-  /** Indica si la lista muestra tareas completadas. */
   isCompleted = input(false);
+  /** Mapa de categorías para resolver nombres y colores. */
+  categoryMap = input<Map<string, Category>>(new Map());
 
-  /** Emite el `id` de la tarea cuyo estado se alterna. */
   toggle = output<string>();
-  /** Emite el `id` de la tarea a eliminar. */
   delete = output<string>();
 
   constructor() {
     addIcons({ trashOutline });
   }
 
-  /**
-   * Abre el panel deslizable de opciones del ítem.
-   * @param slidingItem - Referencia al componente `IonItemSliding`.
-   */
+  getCategory(categoryId: string | null): Category | undefined {
+    if (!categoryId) return undefined;
+    return this.categoryMap().get(categoryId);
+  }
+
   toggleSliding(slidingItem: IonItemSliding): void {
     slidingItem.open('end');
   }

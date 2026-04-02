@@ -1,0 +1,48 @@
+<!-- Input para agregar categorías -->
+<div class="add-category-container">
+  <ion-item lines="none" class="category-input-item">
+    <ion-input
+      [(ngModel)]="newCategoryName"
+      placeholder="Nueva categoría..."
+      (keyup.enter)="addCategory()"
+      [clearInput]="true"
+    ></ion-input>
+    <input
+      type="color"
+      class="color-picker ion-margin-start"
+      [value]="newCategoryColor || suggestedColor"
+      (input)="newCategoryColor = $any($event.target).value"
+    />
+    <ion-button class="ion-margin-start" slot="end" (click)="addCategory()" [disabled]="!newCategoryName.trim()">
+      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+</div>
+
+<!-- Lista de categorías -->
+@if (categoryService.categories().length > 0) {
+  <ion-list class="category-list" lines="none">
+    @for (cat of categoryService.categories(); track cat.id) {
+      <ion-item-sliding #sliding>
+        <ion-item class="category-item">
+          <span class="color-dot" [style.background]="cat.color" slot="start"></span>
+          <ion-label>{{ cat.name }}</ion-label>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="primary" (click)="editCategory(cat.id, cat.name, cat.color); sliding.close()">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="confirmDelete(cat.id, cat.name); sliding.close()">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    }
+  </ion-list>
+} @else {
+  <div class="empty-state">
+    <ion-icon name="color-palette-outline"></ion-icon>
+    <h2>Sin categorías</h2>
+    <p>Crea una categoría para organizar tus tareas</p>
+  </div>
+}

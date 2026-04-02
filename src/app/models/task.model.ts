@@ -10,4 +10,6 @@ export interface Task {
   completed: boolean;
   /** Marca de tiempo (epoch ms) de creación de la tarea. */
   createdAt: number;
+  /** ID de la categoría asignada (`null` si no tiene categoría). */
+  categoryId: string | null;
 }

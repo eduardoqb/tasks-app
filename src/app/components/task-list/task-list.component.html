@@ -15,7 +15,14 @@
           [checked]="task.completed"
           (ionChange)="toggle.emit(task.id)"
         ></ion-checkbox>
-        <ion-label [class.completed-label]="isCompleted()">{{ task.title }}</ion-label>
+        <ion-label [class.completed-label]="isCompleted()">
+          {{ task.title }}
+          @if (getCategory(task.categoryId); as cat) {
+            <ion-badge class="category-badge" [style.--background]="cat.color">
+              {{ cat.name }}
+            </ion-badge>
+          }
+        </ion-label>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="delete.emit(task.id)">

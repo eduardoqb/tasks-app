@@ -8,16 +8,56 @@
       (keyup.enter)="addTask()"
       [clearInput]="true"
     ></ion-input>
-    <ion-button slot="end" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
+    <ion-button class="ion-margin-start" slot="end" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
       <ion-icon slot="icon-only" name="add-outline"></ion-icon>
     </ion-button>
   </ion-item>
+
+  <!-- Selector de categoría para la nueva tarea -->
+  @if (categoryService.categories().length > 0) {
+    <ion-item lines="none" class="category-select-item">
+      <ion-select
+        [(ngModel)]="selectedCategoryId"
+        placeholder="Sin categoría"
+        interface="popover"
+        label="Categoría"
+        labelPlacement="floating"
+      >
+        <ion-select-option [value]="null">Sin categoría</ion-select-option>
+        @for (cat of categoryService.categories(); track cat.id) {
+          <ion-select-option [value]="cat.id">{{ cat.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  }
 </div>
+
+<!-- Filtro por categoría -->
+@if (categoryService.categories().length > 0) {
+  <div class="filter-bar">
+    <ion-chip
+      [class.chip-active]="taskService.categoryFilter() === null"
+      (click)="setFilter(null)"
+    >
+      Todas
+    </ion-chip>
+    @for (cat of categoryService.categories(); track cat.id) {
+      <ion-chip
+        [class.chip-active]="taskService.categoryFilter() === cat.id"
+        (click)="setFilter(cat.id)"
+      >
+        <span class="chip-dot" [style.background]="cat.color"></span>
+        {{ cat.name }}
+      </ion-chip>
+    }
+  </div>
+}
 
 <!-- Tareas pendientes -->
 @if (taskService.pendingTasks().length > 0) {
   <app-task-list
     [tasks]="taskService.pendingTasks()"
+    [categoryMap]="categoryService.categoryMap()"
     title="Pendientes"
     (toggle)="onToggle($event)"
     (delete)="onDelete($event)"
@@ -28,6 +68,7 @@
 @if (taskService.completedTasks().length > 0) {
   <app-task-list
     [tasks]="taskService.completedTasks()"
+    [categoryMap]="categoryService.categoryMap()"
     title="Completadas"
     [isCompleted]="true"
     (toggle)="onToggle($event)"
@@ -36,10 +77,14 @@
 }
 
 <!-- Estado vacío -->
-@if (taskService.tasks().length === 0) {
+@if (taskService.filteredTasks().length === 0) {
   <div class="empty-state">
     <ion-icon name="checkmark-done-outline"></ion-icon>
-    <h2>¡Sin tareas!</h2>
-    <p>Agrega una nueva tarea usando el campo de arriba</p>
+    @if (taskService.categoryFilter() !== null) {
+      <h2>Sin tareas en esta categoría</h2>
+    } @else {
+      <h2>¡Sin tareas!</h2>
+      <p>Agrega una nueva tarea usando el campo de arriba</p>
+    }
   </div>
 }

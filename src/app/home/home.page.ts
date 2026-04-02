@@ -1,9 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonItem, IonIcon, IonButton, IonInput } from '@ionic/angular/standalone';
+import {
+  IonItem, IonIcon, IonButton, IonInput, IonSelect, IonSelectOption, IonChip,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkDoneOutline } from 'ionicons/icons';
+import { addOutline, checkmarkDoneOutline, closeCircleOutline } from 'ionicons/icons';
 import { TaskService } from '../services/task.service';
+import { CategoryService } from '../services/category.service';
 import { TaskListComponent } from '../components/task-list/task-list.component';
 
 @Component({
@@ -12,49 +15,36 @@ import { TaskListComponent } from '../components/task-list/task-list.component';
   styleUrls: ['./home.page.scss'],
   imports: [
     FormsModule,
-    IonItem, IonIcon, IonButton, IonInput,
+    IonItem, IonIcon, IonButton, IonInput, IonSelect, IonSelectOption, IonChip,
     TaskListComponent,
   ],
 })
-/**
- * Página principal de la aplicación.
- *
- * Permite al usuario crear nuevas tareas y gestionar las existentes
- * a través de los componentes hijos de lista.
- */
 export class HomePage {
-  /** Servicio de tareas inyectado para gestionar el estado. */
   taskService = inject(TaskService);
-  /** Modelo bidireccional ligado al campo de entrada de nueva tarea. */
+  categoryService = inject(CategoryService);
+
   newTaskTitle = '';
+  selectedCategoryId: string | null = null;
 
   constructor() {
-    addIcons({ addOutline, checkmarkDoneOutline });
+    addIcons({ addOutline, checkmarkDoneOutline, closeCircleOutline });
   }
 
-  /**
-   * Crea una nueva tarea a partir del título ingresado.
-   * Limpia el campo de entrada tras la creación exitosa.
-   */
   addTask(): void {
     if (!this.newTaskTitle.trim()) return;
-    this.taskService.addTask(this.newTaskTitle);
+    this.taskService.addTask(this.newTaskTitle, this.selectedCategoryId);
     this.newTaskTitle = '';
   }
 
-  /**
-   * Alterna el estado completado/pendiente de una tarea.
-   * @param id - Identificador único de la tarea.
-   */
   onToggle(id: string): void {
     this.taskService.toggleTask(id);
   }
 
-  /**
-   * Elimina una tarea de la lista.
-   * @param id - Identificador único de la tarea.
-   */
   onDelete(id: string): void {
     this.taskService.deleteTask(id);
+  }
+
+  setFilter(categoryId: string | null): void {
+    this.taskService.setFilter(categoryId);
   }
 }
